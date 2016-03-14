@@ -38,6 +38,7 @@ Source: "*.dll"; DestDir: "{app}"; Components: core; Flags: ignoreversion
 ;Source: "*.dll.config"; DestDir: "{app}"; Components: core; Flags: ignoreversion
 
 [Run]
+Filename: "{sys}\netsh.exe"; Parameters: "http add urlacl url=""http://+:9100/"" user=everyone"
 Filename: "{app}\NodeExporterWindows.Service.exe"; Parameters: "--install"
 Filename: {sys}\sc.exe; Parameters: "start PrometheusNodeExporter" ; Flags: runhidden
 
