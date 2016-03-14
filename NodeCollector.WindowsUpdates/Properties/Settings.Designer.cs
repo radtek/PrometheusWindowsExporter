@@ -34,7 +34,7 @@ namespace NodeCollector.WindowsUpdates.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("IsInstalled=1 And IsHidden=0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("IsInstalled=0")]
         public string WindowsUpdateSearchFilter {
             get {
                 return ((string)(this["WindowsUpdateSearchFilter"]));
