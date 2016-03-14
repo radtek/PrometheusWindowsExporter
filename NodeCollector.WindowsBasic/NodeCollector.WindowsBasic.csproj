@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CB87C4C5-3FFB-4A38-8C9D-203E9CF23E4A}</ProjectGuid>
+    <ProjectGuid>{7429895D-F03D-4393-A561-0BA94641E48C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PrometheusCollectors</RootNamespace>
-    <AssemblyName>PrometheusCollectors</AssemblyName>
+    <RootNamespace>NodeCollector.WindowsBasic</RootNamespace>
+    <AssemblyName>NodeCollector.WindowsBasic</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -56,11 +56,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IPrometheusCollector.cs" />
+    <Compile Include="WindowsBasic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NodeCollector.Core\NodeCollector.Core.csproj">
+      <Project>{cb87c4c5-3ffb-4a38-8c9d-203e9cf23e4a}</Project>
+      <Name>NodeCollector.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

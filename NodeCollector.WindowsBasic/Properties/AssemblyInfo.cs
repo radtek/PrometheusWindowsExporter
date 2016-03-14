@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("PrometheusCollectors")]
+[assembly: AssemblyTitle("NodeCollector.WindowsBasic")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PrometheusCollectors")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
+[assembly: AssemblyProduct("NodeCollector.WindowsBasic")]
+[assembly: AssemblyCopyright("Copyright © 2016 Thorsten Sauter")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("cb87c4c5-3ffb-4a38-8c9d-203e9cf23e4a")]
+[assembly: Guid("7429895d-f03d-4393-a561-0ba94641e48c")]
 
 // Version information for an assembly consists of the following four values:
 //

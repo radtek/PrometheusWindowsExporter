@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
 using Prometheus;
-using PrometheusCollector;
+using NodeCollector;
 
 namespace NodeExporterWindows
 {
@@ -20,7 +20,7 @@ namespace NodeExporterWindows
 
             foreach (string filename in pluginFiles)
             {
-                IPrometheusCollector plugin = Program.LoadAssembly(filename);
+                NodeCollector.Core.INodeCollector plugin = Program.LoadAssembly(filename);
                 plugin.RegisterMetrics();
             }
 
@@ -45,16 +45,16 @@ namespace NodeExporterWindows
             Console.WriteLine("Exiting...");
         }
 
-        private static IPrometheusCollector LoadAssembly(string assemblyPath)
+        private static NodeCollector.Core.INodeCollector LoadAssembly(string assemblyPath)
         {
             string assembly = Path.GetFullPath(assemblyPath);
             Assembly ptrAssembly = Assembly.LoadFile(assembly);
             foreach (Type item in ptrAssembly.GetTypes())
             {
                 if (!item.IsClass) continue;
-                if (item.GetInterfaces().Contains(typeof(IPrometheusCollector)))
+                if (item.GetInterfaces().Contains(typeof(NodeCollector.Core.INodeCollector)))
                 {
-                    return (IPrometheusCollector)Activator.CreateInstance(item);
+                    return (NodeCollector.Core.INodeCollector)Activator.CreateInstance(item);
                 }
             }
             throw new Exception("Invalid DLL, Interface not found!");

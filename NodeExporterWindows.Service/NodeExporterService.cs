@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
-using PrometheusCollector;
+using NodeCollector;
 using Prometheus;
 
 // Docu: http://blog.nager.at/2012/01/visual-studio-2010-windows-service-erstellen/
@@ -35,7 +35,7 @@ namespace NodeExporterWindows.Service
 
             foreach (string filename in pluginFiles)
             {
-                IPrometheusCollector plugin = this.LoadAssembly(filename);
+                NodeCollector.Core.INodeCollector plugin = this.LoadAssembly(filename);
                 plugin.RegisterMetrics();
             }
 
@@ -47,16 +47,16 @@ namespace NodeExporterWindows.Service
         {
         }
 
-        private IPrometheusCollector LoadAssembly(string assemblyPath)
+        private NodeCollector.Core.INodeCollector LoadAssembly(string assemblyPath)
         {
             string assembly = Path.GetFullPath(assemblyPath);
             Assembly ptrAssembly = Assembly.LoadFile(assembly);
             foreach (Type item in ptrAssembly.GetTypes())
             {
                 if (!item.IsClass) continue;
-                if (item.GetInterfaces().Contains(typeof(IPrometheusCollector)))
+                if (item.GetInterfaces().Contains(typeof(NodeCollector.Core.INodeCollector)))
                 {
-                    return (IPrometheusCollector)Activator.CreateInstance(item);
+                    return (NodeCollector.Core.INodeCollector)Activator.CreateInstance(item);
                 }
             }
             throw new Exception("Invalid DLL, Interface not found!");

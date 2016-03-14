@@ -6,10 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Diagnostics;
-using PrometheusCollector;
 using Prometheus;
+using NodeCollector;
 
-namespace PrometheusCollector.WindowsCore
+namespace NodeCollector.WindowsBasic
 {
 
     public class CounterEntry
@@ -19,7 +19,7 @@ namespace PrometheusCollector.WindowsCore
         public object PrometheusCollector { get; set; }
     }
 
-    public class WindowsCore : IPrometheusCollector
+    public class WindowsCore : NodeCollector.Core.INodeCollector
     {
         private List<CounterEntry> RegisteredCounts;
 

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PrometheusCollector
+namespace NodeCollector.Core
 {
-    public interface IPrometheusCollector
+    public interface INodeCollector
     {
         void RegisterMetrics();
     }
