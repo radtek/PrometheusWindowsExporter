@@ -35,7 +35,7 @@ Name: "core"; Description: "Common Programs and Files."; Types: full custom; Fla
 Source: "*.exe"; DestDir: "{app}"; Components: core; Flags: ignoreversion
 Source: "*.exe.config"; DestDir: "{app}"; Components: core; Flags: ignoreversion
 Source: "*.dll"; DestDir: "{app}"; Components: core; Flags: ignoreversion
-;Source: "*.dll.config"; DestDir: "{app}"; Components: core; Flags: ignoreversion
+Source: "*.dll.config"; DestDir: "{app}"; Components: core; Flags: ignoreversion
 
 [Run]
 Filename: "{sys}\netsh.exe"; Parameters: "http add urlacl url=""http://+:9100/"" user=everyone"
