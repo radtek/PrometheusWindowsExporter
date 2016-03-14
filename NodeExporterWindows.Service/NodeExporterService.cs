@@ -31,7 +31,7 @@ namespace NodeExporterWindows.Service
         protected override void OnStart(string[] args)
         {
             string dllDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string[] pluginFiles = Directory.GetFiles(dllDirectory, "PrometheusCollector.*.dll");
+            string[] pluginFiles = Directory.GetFiles(dllDirectory, "NodeCollector.*.dll");
 
             List<NodeCollector.Core.INodeCollector> runningPlugins = new List<NodeCollector.Core.INodeCollector>();
             foreach (string filename in pluginFiles)
