@@ -33,10 +33,12 @@ namespace NodeExporterWindows.Service
             string dllDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string[] pluginFiles = Directory.GetFiles(dllDirectory, "PrometheusCollector.*.dll");
 
+            List<NodeCollector.Core.INodeCollector> runningPlugins = new List<NodeCollector.Core.INodeCollector>();
             foreach (string filename in pluginFiles)
             {
                 NodeCollector.Core.INodeCollector plugin = this.LoadAssembly(filename);
                 plugin.RegisterMetrics();
+                runningPlugins.Add(plugin);
             }
 
             MetricServer metricServer = new MetricServer(port: 9100);
