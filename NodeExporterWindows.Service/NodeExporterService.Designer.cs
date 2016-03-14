@@ -31,7 +31,7 @@
             // 
             // NodeExporterService
             // 
-            this.ServiceName = "Service1";
+            this.ServiceName = "PrometheusNodeExporter";
 
         }
 
