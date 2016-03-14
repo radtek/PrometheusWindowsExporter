@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="SearchInvervalSeconds" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">60</Value>
+      <Value Profile="(Default)">3600</Value>
     </Setting>
     <Setting Name="WindowsUpdateSearchFilter" Type="System.String" Scope="Application">
       <Value Profile="(Default)">IsInstalled=0</Value>

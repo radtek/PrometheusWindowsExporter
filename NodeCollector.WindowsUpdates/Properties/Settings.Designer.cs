@@ -25,7 +25,7 @@ namespace NodeCollector.WindowsUpdates.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("60")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3600")]
         public int SearchInvervalSeconds {
             get {
                 return ((int)(this["SearchInvervalSeconds"]));
