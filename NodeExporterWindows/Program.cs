@@ -15,9 +15,6 @@ namespace NodeExporterWindows
     {
         static void Main(string[] args)
         {
-            Counter counter = Metrics.CreateCounter("myCounter", "some help about this");
-            counter.Inc(5.5);
-
             string dllDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string[] pluginFiles = Directory.GetFiles(dllDirectory, "PrometheusCollector.*.dll");
 
