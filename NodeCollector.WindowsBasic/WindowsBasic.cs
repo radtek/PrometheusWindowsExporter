@@ -8,6 +8,7 @@ using System.Timers;
 using System.Diagnostics;
 using Prometheus;
 using NodeCollector;
+using NodeCollector.WindowsBasic.Properties;
 
 namespace NodeCollector.WindowsBasic
 {
@@ -21,6 +22,7 @@ namespace NodeCollector.WindowsBasic
 
     public class WindowsCore : NodeCollector.Core.INodeCollector
     {
+        private System.Threading.Timer MetricUpdateTimer;
         private List<CounterEntry> RegisteredCounts;
 
         public WindowsCore()
@@ -49,33 +51,36 @@ namespace NodeCollector.WindowsBasic
 
             this.RegisterPrintSpooler();
 
-            System.Timers.Timer metricUpdateTimer = new System.Timers.Timer(1000);
-            metricUpdateTimer.Elapsed += UpdateMetrics;
-            metricUpdateTimer.Enabled = true;
-            metricUpdateTimer.Start();
+            // Load search interval from properties.
+            TimeSpan rumpTime = TimeSpan.FromSeconds(NodeCollector.WindowsBasic.Properties.Settings.Default.SearchRumpTime);
+            TimeSpan searchInterval = TimeSpan.FromSeconds(NodeCollector.WindowsBasic.Properties.Settings.Default.SearchInvervalSeconds);
+            Debug.WriteLine("WindowsCore::RegisterMetrics(): Initializing metrics for Windows Code. Searching all {0} seconds (starting in {1} s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds);
 
-            /*
-            while(true)
-            {
-                if (!metricUpdateTimer.Enabled)
-                {
-                    metricUpdateTimer.Enabled = true;
-                }
-                Thread.Sleep(10); // probing every 10 seconds for timer
-            }
-            Debug.WriteLine("xx");
-            */
+            // Initialize a timer to search all XX minutes for new updates.
+            // The process is very time intersive, so please do not lower this value below one hour.
+            this.MetricUpdateTimer = new System.Threading.Timer(this.UpdateMetrics,
+                this,
+                Convert.ToInt32(rumpTime.TotalMilliseconds),
+                Convert.ToInt32(searchInterval.TotalMilliseconds)
+                );
+
         }
 
-        private void UpdateMetrics(object sender, ElapsedEventArgs e)
+        public void Shutdown()
         {
-            Debug.WriteLine("Update metics...");
-            //return;
+            Debug.WriteLine(string.Format("WindowsBasic::Shutdown(): Stopping timer."));
+            this.MetricUpdateTimer.Change(Timeout.Infinite, Timeout.Infinite);
+        }
+
+        private void UpdateMetrics(object state)
+        {
+            Debug.WriteLine(string.Format("NodeCollector.WindowsBasic::UpdateMetrics(): Reading perfmon counters ({0}).", DateTime.Now.ToString()));
+
             foreach (CounterEntry entry in this.RegisteredCounts)
             {
                 long rawValue = entry.PerfCounter.RawValue;
                 float nextValue = entry.PerfCounter.NextValue();
-                Debug.WriteLine(String.Format(@"<PerfCounter> {0}\{1}\{2}: {3}", entry.PerfCounter.CategoryName, entry.PerfCounter.CounterName, entry.PerfCounter.InstanceName, nextValue));
+                //Debug.WriteLine(String.Format(@"<PerfCounter> {0}\{1}\{2}: {3}", entry.PerfCounter.CategoryName, entry.PerfCounter.CounterName, entry.PerfCounter.InstanceName, nextValue));
                 Prometheus.Gauge g = (Prometheus.Gauge)entry.PrometheusCollector;
                 g.Labels(entry.PerfCounter.InstanceName).Set(nextValue);
             }

@@ -9,5 +9,6 @@ namespace NodeCollector.Core
     public interface INodeCollector
     {
         void RegisterMetrics();
+        void Shutdown();
     }
 }
