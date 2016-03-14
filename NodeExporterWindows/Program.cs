@@ -18,18 +18,21 @@ namespace NodeExporterWindows
             string dllDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string[] pluginFiles = Directory.GetFiles(dllDirectory, "NodeCollector.*.dll");
 
+            List<NodeCollector.Core.INodeCollector> runningPlugins = new List<NodeCollector.Core.INodeCollector>();
             foreach (string filename in pluginFiles)
             {
                 NodeCollector.Core.INodeCollector plugin = Program.LoadAssembly(filename);
                 plugin.RegisterMetrics();
+                runningPlugins.Add(plugin);
             }
 
             // netsh http add urlacl url="http://+:9100/" user=everyone OR user=domain\xx
+            MetricServer metricServer;
             while (true)
             {
                 try
                 {
-                    MetricServer metricServer = new MetricServer(port: 9100);
+                    metricServer = new MetricServer(port: 9100);
                     metricServer.Start();
                     break;
                 }
@@ -39,6 +42,16 @@ namespace NodeExporterWindows
                     continue;
                 }
             }
+
+
+            /*Console.WriteLine("Sleeping...");
+            Thread.Sleep(TimeSpan.FromSeconds(15));
+            foreach(NodeCollector.Core.INodeCollector plugin in runningPlugins)
+            {
+                plugin.Shutdown();
+            }
+        */
+            //metricServer.Stop();
 
             Console.WriteLine("Waiting...");
             Console.ReadLine();
