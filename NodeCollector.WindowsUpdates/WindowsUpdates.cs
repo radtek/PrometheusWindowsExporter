@@ -55,7 +55,9 @@ namespace NodeCollector.WindowsUpdates
 
         private void SearchForUpdates(object state)
         {
-            GVars.MyLog.WriteEntry(string.Format("Start searching for new Windows updates."), EventLogEntryType.Information, 1000);
+            bool searchOnline = NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchOnline;
+
+            GVars.MyLog.WriteEntry(string.Format("Start searching for new Windows updates (Search online: {0})", searchOnline.ToString().ToLower()), EventLogEntryType.Information, 1000);
             Stopwatch sw = new Stopwatch();
 
             try
@@ -68,7 +70,7 @@ namespace NodeCollector.WindowsUpdates
 
                 UpdateSession updSession = new UpdateSession();
                 IUpdateSearcher updSearcher = updSession.CreateUpdateSearcher();
-                updSearcher.Online = NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchOnline;
+                updSearcher.Online = searchOnline;
 
                 ISearchResult searchResult = updSearcher.Search(NodeCollector.WindowsUpdates.Properties.Settings.Default.WindowsUpdateSearchFilter);
                 if (searchResult.Updates.Count > 0)
