@@ -11,6 +11,8 @@ using System.IO;
 using System.Reflection;
 using NodeCollector;
 using Prometheus;
+using NodeExporterCore;
+using NodeExporterWindows.Service.Properties;
 
 // Docu: http://blog.nager.at/2012/01/visual-studio-2010-windows-service-erstellen/
 // #Install
@@ -30,40 +32,27 @@ namespace NodeExporterWindows.Service
 
         protected override void OnStart(string[] args)
         {
-            this.eventLogMaster.WriteEntry("xx");
+            // Initialize the global logging, usually this should go to the regular Windows eventlog
+            GVars.MyLog = this.eventLogMaster;
 
-            string dllDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string[] pluginFiles = Directory.GetFiles(dllDirectory, "NodeCollector.*.dll");
-
-            List<NodeCollector.Core.INodeCollector> runningPlugins = new List<NodeCollector.Core.INodeCollector>();
-            foreach (string filename in pluginFiles)
+            // Load all plugins an initialize the metrics
+            NodeCollector.Core.PluginCollection availablePlugins = NodeCollector.Core.PluginSystem.LoadCollectors();
+            foreach (NodeCollector.Core.INodeCollector collector in availablePlugins)
             {
-                NodeCollector.Core.INodeCollector plugin = this.LoadAssembly(filename);
-                plugin.RegisterMetrics();
-                runningPlugins.Add(plugin);
+                collector.RegisterMetrics();
             }
 
-            MetricServer metricServer = new MetricServer(port: 9100);
+            ushort port = NodeExporterWindows.Service.Properties.Settings.Default.Port;
+            string metricUrl = "metrics/";
+            GVars.MyLog.WriteEntry(string.Format("Start Prometheus exporter service on port :{0}/tcp (url {1}).", port, metricUrl),
+                EventLogEntryType.Information, 0);
+            MetricServer metricServer = new MetricServer(port: port, url: metricUrl);
             metricServer.Start();
         }
 
         protected override void OnStop()
         {
-        }
-
-        private NodeCollector.Core.INodeCollector LoadAssembly(string assemblyPath)
-        {
-            string assembly = Path.GetFullPath(assemblyPath);
-            Assembly ptrAssembly = Assembly.LoadFile(assembly);
-            foreach (Type item in ptrAssembly.GetTypes())
-            {
-                if (!item.IsClass) continue;
-                if (item.GetInterfaces().Contains(typeof(NodeCollector.Core.INodeCollector)))
-                {
-                    return (NodeCollector.Core.INodeCollector)Activator.CreateInstance(item);
-                }
-            }
-            throw new Exception("Invalid DLL, Interface not found!");
+            GVars.MyLog.WriteEntry("Shutting down Prometheus exporter.", EventLogEntryType.Information, 0);
         }
 
     }

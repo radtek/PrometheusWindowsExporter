@@ -20,14 +20,19 @@ namespace NodeCollector.WindowsBasic
         public object PrometheusCollector { get; set; }
     }
 
-    public class WindowsCore : NodeCollector.Core.INodeCollector
+    public class WindowsBasic : NodeCollector.Core.INodeCollector
     {
         private System.Threading.Timer MetricUpdateTimer;
         private List<CounterEntry> RegisteredCounts;
 
-        public WindowsCore()
+        public WindowsBasic()
         {
             this.RegisteredCounts = new List<CounterEntry>();
+        }
+
+        public string GetName()
+        {
+            return "WindowsBasic";
         }
 
         public void RegisterMetrics()

@@ -8,6 +8,8 @@ namespace NodeCollector.Core
 {
     public interface INodeCollector
     {
+        string GetName();
+
         void RegisterMetrics();
         void Shutdown();
     }

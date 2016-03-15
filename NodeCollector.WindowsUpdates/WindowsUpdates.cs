@@ -22,7 +22,12 @@ namespace NodeCollector.WindowsUpdates
         {
             this.WindowsUpdateGauge = null; // do not initialize the matric as loon as we don't have a valid result
         }
-       
+
+        public string GetName()
+        {
+            return "WindowsUpdates";
+        }
+
         public void RegisterMetrics()
         {
             // Load search interval from properties.

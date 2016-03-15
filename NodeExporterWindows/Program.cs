@@ -8,6 +8,9 @@ using System.IO;
 using System.Reflection;
 using Prometheus;
 using NodeCollector;
+using NodeExporterCore;
+using NodeExporterWindows.Properties;
+using System.Diagnostics;
 
 namespace NodeExporterWindows
 {
@@ -15,62 +18,26 @@ namespace NodeExporterWindows
     {
         static void Main(string[] args)
         {
-            string dllDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string[] pluginFiles = Directory.GetFiles(dllDirectory, "NodeCollector.*.dll");
+            // Initialize the global logging, usually this should go to the regular Windows eventlog
+            GVars.MyLog = new System.Diagnostics.EventLog("Application");
+            GVars.MyLog.Source = "PrometheusNodeExporter";
 
-            List<NodeCollector.Core.INodeCollector> runningPlugins = new List<NodeCollector.Core.INodeCollector>();
-            foreach (string filename in pluginFiles)
+            // Load all plugins an initialize the metrics
+            NodeCollector.Core.PluginCollection availablePlugins = NodeCollector.Core.PluginSystem.LoadCollectors();
+            foreach(NodeCollector.Core.INodeCollector collector in availablePlugins)
             {
-                NodeCollector.Core.INodeCollector plugin = Program.LoadAssembly(filename);
-                plugin.RegisterMetrics();
-                runningPlugins.Add(plugin);
+                collector.RegisterMetrics();
             }
 
-            // netsh http add urlacl url="http://+:9100/" user=everyone OR user=domain\xx
-            MetricServer metricServer;
-            while (true)
-            {
-                try
-                {
-                    metricServer = new MetricServer(port: 9100);
-                    metricServer.Start();
-                    break;
-                }
-                catch
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(10));
-                    continue;
-                }
-            }
+            ushort port = NodeExporterWindows.Properties.Settings.Default.Port;
+            string metricUrl = "metrics/";
+            GVars.MyLog.WriteEntry(string.Format("Start Prometheus exporter service on port :{0}/tcp (url {1}).", port, metricUrl),
+                EventLogEntryType.Information, 0);
+            MetricServer metricServer = new MetricServer(port: port, url: metricUrl);
 
-
-            /*Console.WriteLine("Sleeping...");
-            Thread.Sleep(TimeSpan.FromSeconds(15));
-            foreach(NodeCollector.Core.INodeCollector plugin in runningPlugins)
-            {
-                plugin.Shutdown();
-            }
-        */
-            //metricServer.Stop();
-
-            Console.WriteLine("Waiting...");
+            Console.WriteLine("Press [ENTER] twice to exit...");
             Console.ReadLine();
-            Console.WriteLine("Exiting...");
-        }
-
-        private static NodeCollector.Core.INodeCollector LoadAssembly(string assemblyPath)
-        {
-            string assembly = Path.GetFullPath(assemblyPath);
-            Assembly ptrAssembly = Assembly.LoadFile(assembly);
-            foreach (Type item in ptrAssembly.GetTypes())
-            {
-                if (!item.IsClass) continue;
-                if (item.GetInterfaces().Contains(typeof(NodeCollector.Core.INodeCollector)))
-                {
-                    return (NodeCollector.Core.INodeCollector)Activator.CreateInstance(item);
-                }
-            }
-            throw new Exception("Invalid DLL, Interface not found!");
+            Console.ReadLine();
         }
 
     }
