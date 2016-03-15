@@ -30,6 +30,8 @@ namespace NodeExporterWindows.Service
 
         protected override void OnStart(string[] args)
         {
+            this.eventLogMaster.WriteEntry("xx");
+
             string dllDirectory = AppDomain.CurrentDomain.BaseDirectory;
             string[] pluginFiles = Directory.GetFiles(dllDirectory, "NodeCollector.*.dll");
 

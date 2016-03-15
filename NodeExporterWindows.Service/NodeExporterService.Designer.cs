@@ -28,13 +28,23 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.eventLogMaster = new System.Diagnostics.EventLog();
+            ((System.ComponentModel.ISupportInitialize)(this.eventLogMaster)).BeginInit();
+            // 
+            // eventLogMaster
+            // 
+            this.eventLogMaster.Log = "Application";
+            this.eventLogMaster.Source = "PrometheusNodeExporter";
             // 
             // NodeExporterService
             // 
             this.ServiceName = "PrometheusNodeExporter";
+            ((System.ComponentModel.ISupportInitialize)(this.eventLogMaster)).EndInit();
 
         }
 
         #endregion
+
+        private System.Diagnostics.EventLog eventLogMaster;
     }
 }
