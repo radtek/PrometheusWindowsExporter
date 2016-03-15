@@ -10,6 +10,7 @@ using WUApiLib;
 using System.Diagnostics;
 using System.Timers;
 using NodeCollector.WindowsUpdates.Properties;
+using NodeExporterCore;
 
 namespace NodeCollector.WindowsUpdates
 {
@@ -33,7 +34,7 @@ namespace NodeCollector.WindowsUpdates
             // Load search interval from properties.
             TimeSpan rumpTime = TimeSpan.FromSeconds(NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchRumpTime);
             TimeSpan searchInterval = TimeSpan.FromSeconds(NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchInvervalSeconds);
-            Debug.WriteLine("WindowsUpdates::RegisterMetrics(): Initializing metrics for Windows Updates. Searching all {0} seconds (starting in {1} s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds);
+            GVars.MyLog.WriteEntry(string.Format("Initializing WindowUpdates collector (Search interval is {0}s, Rump time is {1}s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
 
             // Initialize a timer to search all XX minutes for new updates.
             // The process is very time intersive, so please do not lower this value below one hour.
@@ -48,35 +49,50 @@ namespace NodeCollector.WindowsUpdates
 
         public void Shutdown()
         {
-            Debug.WriteLine(string.Format("WindowsUpdates::Shutdown(): Stopping timer."));
+            GVars.MyLog.WriteEntry("Shutting down WindowUpdates collector.", EventLogEntryType.Warning, 1000);
             this.MetricUpdateTimer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
         private void SearchForUpdates(object state)
         {
-            Debug.WriteLine(string.Format("NodeCollector.WindowsUpdates::SearchForUpdates(): Searching for new updates ({0}).", DateTime.Now.ToString()));
+            GVars.MyLog.WriteEntry(string.Format("Start searching for new Windows updates."), EventLogEntryType.Information, 1000);
+            Stopwatch sw = new Stopwatch();
 
-            this.WindowsUpdateGauge = Metrics.CreateGauge("windows_updates_pending_total", "Number of pending Windows patches");
-
-            UpdateSession updSession = new UpdateSession();
-            IUpdateSearcher updSearcher = updSession.CreateUpdateSearcher();
-            updSearcher.Online = NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchOnline;
             try
             {
+
+                if (this.WindowsUpdateGauge == null)
+                {
+                    this.WindowsUpdateGauge = Metrics.CreateGauge("windows_updates_pending_total", "Number of pending Windows patches");
+                }
+
+                UpdateSession updSession = new UpdateSession();
+                IUpdateSearcher updSearcher = updSession.CreateUpdateSearcher();
+                updSearcher.Online = NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchOnline;
+
                 ISearchResult searchResult = updSearcher.Search(NodeCollector.WindowsUpdates.Properties.Settings.Default.WindowsUpdateSearchFilter);
+                if (searchResult.Updates.Count > 0)
+                {
+                    GVars.MyLog.WriteEntry(string.Format("Found {0} missing Windows updates. Updating metric.", searchResult.Updates.Count), EventLogEntryType.Information, 1000);
+                }
+                else
+                {
+                    GVars.MyLog.WriteEntry("No missing Windows updates found.", EventLogEntryType.Information, 1000);
+                }
                 this.WindowsUpdateGauge.Set(searchResult.Updates.Count);
+
                 /*
                 foreach (IUpdate update in searchResult.Updates)
                 { }
                 */
+
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(string.Format("NodeCollector.WindowsUpdates::SearchForUpdates(): Searching failed: {0}.", ex.Message.ToString()));
-                return;
+                GVars.MyLog.WriteEntry(string.Format("Failed to query for missing Windows updates: {0}", ex.Message.ToString()), EventLogEntryType.Error, 1000);
             }
 
-            Debug.WriteLine(string.Format("NodeCollector.WindowsUpdates::SearchForUpdates(): Searching finished ({0}).", DateTime.Now.ToString()));
+            return;
         }
 
     }

@@ -77,6 +77,10 @@
       <Project>{cb87c4c5-3ffb-4a38-8c9d-203e9cf23e4a}</Project>
       <Name>NodeCollector.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NodeExporterCore\NodeExporterCore.csproj">
+      <Project>{a58caa02-5a29-44c6-accb-ab27fa66b225}</Project>
+      <Name>NodeExporterCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="WUApiLib">
