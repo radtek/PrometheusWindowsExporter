@@ -17,11 +17,14 @@ namespace NodeCollector.WindowsUpdates
     public class WindowsUpdates : NodeCollector.Core.INodeCollector
     {
         private System.Threading.Timer MetricUpdateTimer;
-        private Prometheus.Gauge WindowsUpdateGauge;
+        private Prometheus.Gauge WindowsUpdateLastScanTime;
+        private Prometheus.Gauge WindowsUpdateMissingUpdatesTotal;
+        private Prometheus.Summary WindowsUpdateScanDuration;
 
         public WindowsUpdates()
         {
-            this.WindowsUpdateGauge = null; // do not initialize the matric as loon as we don't have a valid result
+            this.WindowsUpdateLastScanTime = null;
+            this.WindowsUpdateMissingUpdatesTotal = null; // do not initialize the matric as loon as we don't have a valid result
         }
 
         public string GetName()
@@ -58,14 +61,14 @@ namespace NodeCollector.WindowsUpdates
             bool searchOnline = NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchOnline;
 
             GVars.MyLog.WriteEntry(string.Format("Start searching for new Windows updates (Search online: {0})", searchOnline.ToString().ToLower()), EventLogEntryType.Information, 1000);
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = Stopwatch.StartNew();
 
             try
             {
 
-                if (this.WindowsUpdateGauge == null)
+                if (this.WindowsUpdateMissingUpdatesTotal == null)
                 {
-                    this.WindowsUpdateGauge = Metrics.CreateGauge("windows_updates_pending_total", "Number of pending Windows patches");
+                    this.WindowsUpdateMissingUpdatesTotal = Metrics.CreateGauge("windows_updates_missing_total", "Number of missing Windows patches");
                 }
 
                 UpdateSession updSession = new UpdateSession();
@@ -81,13 +84,25 @@ namespace NodeCollector.WindowsUpdates
                 {
                     GVars.MyLog.WriteEntry("No missing Windows updates found.", EventLogEntryType.Information, 1000);
                 }
-                this.WindowsUpdateGauge.Set(searchResult.Updates.Count);
+                this.WindowsUpdateMissingUpdatesTotal.Set(searchResult.Updates.Count);
 
                 /*
                 foreach (IUpdate update in searchResult.Updates)
                 { }
                 */
 
+                if (this.WindowsUpdateLastScanTime == null)
+                {
+                    this.WindowsUpdateLastScanTime = Metrics.CreateGauge("windows_updates_last_scan_time", "Last search time, in unixtime.");
+                }
+                Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                this.WindowsUpdateLastScanTime.Set(unixTimestamp);
+
+                if (this.WindowsUpdateScanDuration == null)
+                {
+                    this.WindowsUpdateScanDuration = Metrics.CreateSummary("windows_updates_last_scan_duration_milliseconds", "Last scan time, milliseconds.");
+                    this.WindowsUpdateScanDuration.Observe(sw.ElapsedMilliseconds);
+                }
             }
             catch (Exception ex)
             {
