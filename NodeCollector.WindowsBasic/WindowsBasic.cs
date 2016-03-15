@@ -9,6 +9,7 @@ using System.Diagnostics;
 using Prometheus;
 using NodeCollector;
 using NodeCollector.WindowsBasic.Properties;
+using NodeExporterCore;
 
 namespace NodeCollector.WindowsBasic
 {
@@ -37,6 +38,11 @@ namespace NodeCollector.WindowsBasic
 
         public void RegisterMetrics()
         {
+            // Load search interval from properties.
+            TimeSpan rumpTime = TimeSpan.FromSeconds(NodeCollector.WindowsBasic.Properties.Settings.Default.SearchRumpTime);
+            TimeSpan searchInterval = TimeSpan.FromSeconds(NodeCollector.WindowsBasic.Properties.Settings.Default.SearchInvervalSeconds);
+            GVars.MyLog.WriteEntry(string.Format("Initializing WindowsBasic collector (Search interval is {0}s, Rump time is {1}s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
+
             /*
              * CPU
              */
@@ -56,11 +62,6 @@ namespace NodeCollector.WindowsBasic
 
             this.RegisterPrintSpooler();
 
-            // Load search interval from properties.
-            TimeSpan rumpTime = TimeSpan.FromSeconds(NodeCollector.WindowsBasic.Properties.Settings.Default.SearchRumpTime);
-            TimeSpan searchInterval = TimeSpan.FromSeconds(NodeCollector.WindowsBasic.Properties.Settings.Default.SearchInvervalSeconds);
-            Debug.WriteLine("WindowsCore::RegisterMetrics(): Initializing metrics for Windows Code. Searching all {0} seconds (starting in {1} s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds);
-
             // Initialize a timer to search all XX minutes for new updates.
             // The process is very time intersive, so please do not lower this value below one hour.
             this.MetricUpdateTimer = new System.Threading.Timer(this.UpdateMetrics,
@@ -73,7 +74,7 @@ namespace NodeCollector.WindowsBasic
 
         public void Shutdown()
         {
-            Debug.WriteLine(string.Format("WindowsBasic::Shutdown(): Stopping timer."));
+            GVars.MyLog.WriteEntry("Shutting down WindowsBasic collector.", EventLogEntryType.Warning, 1000);
             this.MetricUpdateTimer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
