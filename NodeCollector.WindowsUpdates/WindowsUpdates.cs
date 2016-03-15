@@ -34,7 +34,7 @@ namespace NodeCollector.WindowsUpdates
             // Load search interval from properties.
             TimeSpan rumpTime = TimeSpan.FromSeconds(NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchRumpTime);
             TimeSpan searchInterval = TimeSpan.FromSeconds(NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchInvervalSeconds);
-            GVars.MyLog.WriteEntry(string.Format("Initializing WindowUpdates collector (Search interval is {0}s, Rump time is {1}s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
+            GVars.MyLog.WriteEntry(string.Format("Initializing WindowsUpdates collector (Search interval is {0}s, Rump time is {1}s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
 
             // Initialize a timer to search all XX minutes for new updates.
             // The process is very time intersive, so please do not lower this value below one hour.
@@ -49,7 +49,7 @@ namespace NodeCollector.WindowsUpdates
 
         public void Shutdown()
         {
-            GVars.MyLog.WriteEntry("Shutting down WindowUpdates collector.", EventLogEntryType.Warning, 1000);
+            GVars.MyLog.WriteEntry("Shutting down WindowsUpdates collector.", EventLogEntryType.Warning, 1000);
             this.MetricUpdateTimer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
