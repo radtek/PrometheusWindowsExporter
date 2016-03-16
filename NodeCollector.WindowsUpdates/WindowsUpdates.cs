@@ -35,8 +35,9 @@ namespace NodeCollector.WindowsUpdates
         public void RegisterMetrics()
         {
             // Load search interval from properties.
+            TimeSpan randomOffset = (NodeCollector.WindowsUpdates.Properties.Settings.Default.UseRandomOffset == true) ? TimeSpan.FromSeconds(new Random().Next(120, 5*60)) : TimeSpan.FromSeconds(0);
             TimeSpan rumpTime = TimeSpan.FromSeconds(NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchRumpTime);
-            TimeSpan searchInterval = TimeSpan.FromSeconds(NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchInvervalSeconds);
+            TimeSpan searchInterval = TimeSpan.FromSeconds(NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchInvervalSeconds) + randomOffset;
             GVars.MyLog.WriteEntry(string.Format("Initializing WindowsUpdates collector (Search interval is {0}s, Rump time is {1}s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
 
             // Initialize a timer to search all XX minutes for new updates.

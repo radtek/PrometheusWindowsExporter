@@ -58,5 +58,14 @@ namespace NodeCollector.WindowsUpdates.Properties {
                 return ((int)(this["SearchRumpTime"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UseRandomOffset {
+            get {
+                return ((bool)(this["UseRandomOffset"]));
+            }
+        }
     }
 }
