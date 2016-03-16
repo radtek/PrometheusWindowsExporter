@@ -34,6 +34,7 @@ namespace NodeExporterWindows
             GVars.MyLog.WriteEntry(string.Format("Start Prometheus exporter service on port :{0}/tcp (url {1}).", port, metricUrl),
                 EventLogEntryType.Information, 0);
             MetricServer metricServer = new MetricServer(port: port, url: metricUrl);
+            metricServer.Start();
 
             Console.WriteLine("Press [ENTER] twice to exit...");
             Console.ReadLine();
