@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeCollector.WindowsUpdate
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeExporterCore", "NodeExporterCore\NodeExporterCore.csproj", "{A58CAA02-5A29-44C6-ACCB-AB27FA66B225}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeCollector.TaskScheduler", "NodeCollector.TaskScheduler\NodeCollector.TaskScheduler.csproj", "{964E3F2A-F128-4AC5-8BD3-3762EFDEA84C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{A58CAA02-5A29-44C6-ACCB-AB27FA66B225}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A58CAA02-5A29-44C6-ACCB-AB27FA66B225}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A58CAA02-5A29-44C6-ACCB-AB27FA66B225}.Release|Any CPU.Build.0 = Release|Any CPU
+		{964E3F2A-F128-4AC5-8BD3-3762EFDEA84C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{964E3F2A-F128-4AC5-8BD3-3762EFDEA84C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{964E3F2A-F128-4AC5-8BD3-3762EFDEA84C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{964E3F2A-F128-4AC5-8BD3-3762EFDEA84C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
