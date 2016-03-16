@@ -21,6 +21,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\PrometheusNodeExporter
 DefaultGroupName=Prometheus Node Exporter
 DisableProgramGroupPage=yes
+OutputDir=.\
 OutputBaseFilename=setup
 Compression=lzma
 SolidCompression=yes
