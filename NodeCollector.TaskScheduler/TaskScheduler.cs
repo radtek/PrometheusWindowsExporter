@@ -33,7 +33,7 @@ namespace NodeCollector.TaskScheduler
         {
             this.TaskLastResultGauge = Metrics.CreateGauge("taskscheduler_task_result", "Return code from task scheduler.", labelNames: new[] { "taskname", "state" });
             this.TaskLastMissedGauge = Metrics.CreateGauge("taskscheduler_task_missedruns", "Execution time of the task.", labelNames: new[] { "taskname", "state" });
-            this.TaskLastRuntimeGauge = Metrics.CreateGauge("taskscheduler_task_runtime", "Execution time of the task.", labelNames: new[] { "taskname", "state" });
+            this.TaskLastRuntimeGauge = Metrics.CreateGauge("taskscheduler_task_last_runtime", "Execution time of the task.", labelNames: new[] { "taskname", "state" });
         }
 
         public string GetName()
