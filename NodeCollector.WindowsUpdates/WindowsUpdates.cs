@@ -17,14 +17,19 @@ namespace NodeCollector.WindowsUpdates
     public class WindowsUpdates : NodeCollector.Core.INodeCollector
     {
         private System.Threading.Timer MetricUpdateTimer;
-        private Prometheus.Gauge WindowsUpdateLastScanTime;
         private Prometheus.Gauge WindowsUpdateMissingUpdatesTotal;
+        private Prometheus.Gauge WindowsUpdateLastScanTime;
         private Prometheus.Summary WindowsUpdateScanDuration;
 
         public WindowsUpdates()
         {
-            this.WindowsUpdateLastScanTime = null;
-            this.WindowsUpdateMissingUpdatesTotal = null; // do not initialize the matric as loon as we don't have a valid result
+            this.WindowsUpdateMissingUpdatesTotal = Metrics.CreateGauge("windows_updates_missing_total", "Number of missing Windows patches");
+            this.WindowsUpdateMissingUpdatesTotal.Set(0); // maybe this is the default
+
+            this.WindowsUpdateLastScanTime = Metrics.CreateGauge("windows_updates_last_scan_time", "Last search time, in unixtime.");
+            this.WindowsUpdateLastScanTime.Set(0);
+
+            this.WindowsUpdateScanDuration = Metrics.CreateSummary("windows_updates_last_scan_duration_milliseconds", "Last scan time, milliseconds.");
         }
 
         public string GetName()
@@ -66,12 +71,6 @@ namespace NodeCollector.WindowsUpdates
 
             try
             {
-
-                if (this.WindowsUpdateMissingUpdatesTotal == null)
-                {
-                    this.WindowsUpdateMissingUpdatesTotal = Metrics.CreateGauge("windows_updates_missing_total", "Number of missing Windows patches");
-                }
-
                 UpdateSession updSession = new UpdateSession();
                 IUpdateSearcher updSearcher = updSession.CreateUpdateSearcher();
                 updSearcher.Online = searchOnline;
@@ -92,18 +91,12 @@ namespace NodeCollector.WindowsUpdates
                 { }
                 */
 
-                if (this.WindowsUpdateLastScanTime == null)
-                {
-                    this.WindowsUpdateLastScanTime = Metrics.CreateGauge("windows_updates_last_scan_time", "Last search time, in unixtime.");
-                }
+                // Set the last scan time to current timestamp
                 Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
                 this.WindowsUpdateLastScanTime.Set(unixTimestamp);
 
-                if (this.WindowsUpdateScanDuration == null)
-                {
-                    this.WindowsUpdateScanDuration = Metrics.CreateSummary("windows_updates_last_scan_duration_milliseconds", "Last scan time, milliseconds.");
-                    this.WindowsUpdateScanDuration.Observe(sw.ElapsedMilliseconds);
-                }
+                // How long goes this scan take?
+                this.WindowsUpdateScanDuration.Observe(sw.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
