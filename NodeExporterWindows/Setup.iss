@@ -33,7 +33,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "core"; Description: "Common Programs and Files."; Types: full custom; Flags: fixed
 
 [Files]
-Source: "*.exe"; DestDir: "{app}"; Components: core; Flags: ignoreversion
+Source: "*.exe"; Excludes: "setup.exe"; DestDir: "{app}"; Components: core; Flags: ignoreversion
 Source: "*.exe.config"; DestDir: "{app}"; Components: core; Flags: ignoreversion
 Source: "*.dll"; DestDir: "{app}"; Components: core; Flags: ignoreversion
 Source: "*.dll.config"; DestDir: "{app}"; Components: core; Flags: ignoreversion
