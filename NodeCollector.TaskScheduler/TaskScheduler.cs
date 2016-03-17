@@ -28,12 +28,14 @@ namespace NodeCollector.TaskScheduler
         private Prometheus.Gauge TaskLastResultGauge;
         private Prometheus.Gauge TaskLastMissedGauge;
         private Prometheus.Gauge TaskLastRuntimeGauge;
+        private Prometheus.Gauge TaskLastSuccessRuntimeGauge;
 
         public TaskScheduler()
         {
             this.TaskLastResultGauge = Metrics.CreateGauge("taskscheduler_task_result", "Return code from task scheduler.", labelNames: new[] { "taskname", "folder", "state" });
             this.TaskLastMissedGauge = Metrics.CreateGauge("taskscheduler_task_missedruns", "Execution time of the task.", labelNames: new[] { "taskname", "folder", "state" });
             this.TaskLastRuntimeGauge = Metrics.CreateGauge("taskscheduler_task_last_runtime", "Execution time of the task.", labelNames: new[] { "taskname", "folder", "state" });
+            this.TaskLastSuccessRuntimeGauge = Metrics.CreateGauge("taskscheduler_task_last_success_runtime", "Last successfull execution of the task.", labelNames: new[] { "taskname", "folder", "state" });
         }
 
         public string GetName()
@@ -89,6 +91,16 @@ namespace NodeCollector.TaskScheduler
 
                     Int32 unixTimestamp = (Int32)(t.LastRunTime.ToUniversalTime().Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
                     this.TaskLastRuntimeGauge.Labels(t.Name, folderName, lastState).Set(unixTimestamp);
+
+                    // When the task executed successfully, record the runtime as last success runtime. Otherwise return 0
+                    if (t.LastTaskResult == 0)
+                    {
+                        this.TaskLastSuccessRuntimeGauge.Labels(t.Name, folderName, lastState).Set(unixTimestamp);
+                    }
+                    else
+                    {
+                        this.TaskLastSuccessRuntimeGauge.Labels(t.Name, folderName, lastState).Set(0);
+                    }
                 }
             }
 
