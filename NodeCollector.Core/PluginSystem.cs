@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
 using NodeExporterCore;
+using System.Diagnostics;
 
 namespace NodeCollector.Core
 {
@@ -23,8 +24,14 @@ namespace NodeCollector.Core
             string[] pluginFiles = Directory.GetFiles(dllDirectory, pluginFilter);
             foreach (string filename in pluginFiles)
             {
-                NodeCollector.Core.INodeCollector plugin = PluginSystem.LoadAssembly(filename);
-                loadedPlugins.Add(plugin);
+                try {
+                    NodeCollector.Core.INodeCollector plugin = PluginSystem.LoadAssembly(filename);
+                    loadedPlugins.Add(plugin);
+                }
+                catch(Exception ex)
+                {
+                    GVars.MyLog.WriteEntry(string.Format("Unable to load collector plugin {0}: {1}.", filename, ex.Message.ToString()), EventLogEntryType.Error, 0);
+                }
             }
 
             // Log a list of loaded plugins to eventlog
