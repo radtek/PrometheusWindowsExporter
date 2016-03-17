@@ -25,6 +25,7 @@ namespace NodeCollector.TaskScheduler
     public class TaskScheduler : NodeCollector.Core.INodeCollector
     {
         private System.Threading.Timer MetricUpdateTimer;
+        private Prometheus.Gauge TaskRunStateGauge;
         private Prometheus.Gauge TaskLastResultGauge;
         private Prometheus.Gauge TaskLastMissedGauge;
         private Prometheus.Gauge TaskLastRuntimeGauge;
@@ -32,10 +33,11 @@ namespace NodeCollector.TaskScheduler
 
         public TaskScheduler()
         {
-            this.TaskLastResultGauge = Metrics.CreateGauge("taskscheduler_task_result", "Return code from task scheduler.", labelNames: new[] { "taskname", "location", "state" });
-            this.TaskLastMissedGauge = Metrics.CreateGauge("taskscheduler_task_missedruns", "Execution time of the task.", labelNames: new[] { "taskname", "location", "state" });
-            this.TaskLastRuntimeGauge = Metrics.CreateGauge("taskscheduler_task_last_runtime", "Execution time of the task.", labelNames: new[] { "taskname", "location", "state" });
-            this.TaskLastSuccessRuntimeGauge = Metrics.CreateGauge("taskscheduler_task_last_success_runtime", "Last successfull execution of the task.", labelNames: new[] { "taskname", "location", "state" });
+            this.TaskRunStateGauge = Metrics.CreateGauge("taskscheduler_task_current_state", "Return the current state of the task.", labelNames: new[] { "taskname", "location" });
+            this.TaskLastResultGauge = Metrics.CreateGauge("taskscheduler_task_result", "Return code from task scheduler.", labelNames: new[] { "taskname", "location" });
+            this.TaskLastMissedGauge = Metrics.CreateGauge("taskscheduler_task_missedruns", "Execution time of the task.", labelNames: new[] { "taskname", "location" });
+            this.TaskLastRuntimeGauge = Metrics.CreateGauge("taskscheduler_task_last_runtime", "Execution time of the task.", labelNames: new[] { "taskname", "location" });
+            this.TaskLastSuccessRuntimeGauge = Metrics.CreateGauge("taskscheduler_task_last_success_runtime", "Last successfull execution of the task.", labelNames: new[] { "taskname", "location" });
         }
 
         public string GetName()
@@ -82,24 +84,26 @@ namespace NodeCollector.TaskScheduler
                 List<Microsoft.Win32.TaskScheduler.Task> tasks = taskService.AllTasks.ToList();
                 foreach(Microsoft.Win32.TaskScheduler.Task t in tasks)
                 {
-                    string lastState = ConvertTaskStateToString(t.State);
+                    //string lastState = ConvertTaskStateToString(t.State);
                     string locationName = t.Folder.Path.Replace(@"\", "/");
 
-                    this.TaskLastResultGauge.Labels(t.Name, locationName, lastState).Set(t.LastTaskResult);
+                    this.TaskRunStateGauge.Labels(t.Name, locationName).Set((int)t.State);
 
-                    this.TaskLastMissedGauge.Labels(t.Name, locationName, lastState).Set(t.NumberOfMissedRuns);
+                    this.TaskLastResultGauge.Labels(t.Name, locationName).Set(t.LastTaskResult);
+
+                    this.TaskLastMissedGauge.Labels(t.Name, locationName).Set(t.NumberOfMissedRuns);
 
                     Int32 unixTimestamp = (Int32)(t.LastRunTime.ToUniversalTime().Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
-                    this.TaskLastRuntimeGauge.Labels(t.Name, locationName, lastState).Set(unixTimestamp);
+                    this.TaskLastRuntimeGauge.Labels(t.Name, locationName).Set(unixTimestamp);
 
                     // When the task executed successfully, record the runtime as last success runtime. Otherwise return 0
                     if (t.LastTaskResult == 0)
                     {
-                        this.TaskLastSuccessRuntimeGauge.Labels(t.Name, locationName, lastState).Set(unixTimestamp);
+                        this.TaskLastSuccessRuntimeGauge.Labels(t.Name, locationName).Set(unixTimestamp);
                     }
                     else
                     {
-                        this.TaskLastSuccessRuntimeGauge.Labels(t.Name, locationName, lastState).Set(0);
+                        this.TaskLastSuccessRuntimeGauge.Labels(t.Name, locationName).Set(0);
                     }
                 }
             }
