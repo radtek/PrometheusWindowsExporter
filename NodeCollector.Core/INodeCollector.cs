@@ -9,7 +9,7 @@ namespace NodeCollector.Core
     public interface INodeCollector
     {
         string GetName();
-
+        string GetVersion();
         void RegisterMetrics();
         void Shutdown();
     }

@@ -37,13 +37,20 @@ namespace NodeCollector.WindowsUpdates
             return "WindowsUpdates";
         }
 
+        public string GetVersion()
+        {
+            string version = System.Reflection.Assembly.GetCallingAssembly().GetName().Version.ToString();
+            return version;
+        }
+
         public void RegisterMetrics()
         {
             // Load search interval from properties.
             TimeSpan randomOffset = (NodeCollector.WindowsUpdates.Properties.Settings.Default.UseRandomOffset == true) ? TimeSpan.FromSeconds(new Random().Next(120, 5*60)) : TimeSpan.FromSeconds(0);
             TimeSpan rumpTime = TimeSpan.FromSeconds(NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchRumpTime);
             TimeSpan searchInterval = TimeSpan.FromSeconds(NodeCollector.WindowsUpdates.Properties.Settings.Default.SearchInvervalSeconds) + randomOffset;
-            GVars.MyLog.WriteEntry(string.Format("Initializing WindowsUpdates collector (Search interval is {0}s, Rump time is {1}s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
+            GVars.MyLog.WriteEntry(string.Format("Initializing WindowsUpdates collector v{0} (Search interval is {1}s, Rump time is {2}s).", 
+                this.GetVersion(), searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
 
             // Initialize a timer to search all XX minutes for new updates.
             // The process is very time intersive, so please do not lower this value below one hour.

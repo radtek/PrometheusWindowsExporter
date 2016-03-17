@@ -36,12 +36,19 @@ namespace NodeCollector.WindowsBasic
             return "WindowsBasic";
         }
 
+        public string GetVersion()
+        {
+            string version = System.Reflection.Assembly.GetCallingAssembly().GetName().Version.ToString();
+            return version;
+        }
+
         public void RegisterMetrics()
         {
             // Load search interval from properties.
             TimeSpan rumpTime = TimeSpan.FromSeconds(NodeCollector.WindowsBasic.Properties.Settings.Default.SearchRumpTime);
             TimeSpan searchInterval = TimeSpan.FromSeconds(NodeCollector.WindowsBasic.Properties.Settings.Default.SearchInvervalSeconds);
-            GVars.MyLog.WriteEntry(string.Format("Initializing WindowsBasic collector (Search interval is {0}s, Rump time is {1}s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
+            GVars.MyLog.WriteEntry(string.Format("Initializing WindowsBasic collector v{0} (Search interval is {1}s, Rump time is {2}s).", 
+                this.GetVersion(), searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
 
             /*
              * CPU

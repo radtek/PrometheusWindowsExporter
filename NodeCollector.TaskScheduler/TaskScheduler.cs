@@ -41,12 +41,19 @@ namespace NodeCollector.TaskScheduler
             return "TaskScheduler";
         }
 
+        public string GetVersion()
+        {
+            string version = System.Reflection.Assembly.GetCallingAssembly().GetName().Version.ToString();
+            return version;
+        }
+
         public void RegisterMetrics()
         {
             // Load search interval from properties.
             TimeSpan rumpTime = TimeSpan.FromSeconds(NodeCollector.TaskScheduler.Properties.Settings.Default.SearchRumpTime);
             TimeSpan searchInterval = TimeSpan.FromSeconds(NodeCollector.TaskScheduler.Properties.Settings.Default.SearchInvervalSeconds);
-            GVars.MyLog.WriteEntry(string.Format("Initializing TaskScheduler collector (Search interval is {0}s, Rump time is {1}s).", searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
+            GVars.MyLog.WriteEntry(string.Format("Initializing TaskScheduler collector v{0} (Search interval is {1}s, Rump time is {2}s).", 
+                this.GetVersion(), searchInterval.TotalSeconds, rumpTime.TotalSeconds), EventLogEntryType.Information, 1000);
 
             // Initialize a timer to search all XX minutes for tasks.
             // The process is very time intersive, so please do not lower this value below one hour.
