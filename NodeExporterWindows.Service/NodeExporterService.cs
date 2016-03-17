@@ -42,9 +42,10 @@ namespace NodeExporterWindows.Service
                 collector.RegisterMetrics();
             }
 
+            string version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             ushort port = NodeExporterWindows.Service.Properties.Settings.Default.Port;
             string metricUrl = "metrics/";
-            GVars.MyLog.WriteEntry(string.Format("Start Prometheus exporter service on port :{0}/tcp (url {1}).", port, metricUrl),
+            GVars.MyLog.WriteEntry(string.Format("Start Prometheus exporter v{0} service on port :{1}/tcp (url {2}).", version, port, metricUrl),
                 EventLogEntryType.Information, 0);
             MetricServer metricServer = new MetricServer(port: port, url: metricUrl);
             metricServer.Start();
