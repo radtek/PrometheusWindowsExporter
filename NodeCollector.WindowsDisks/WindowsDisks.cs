@@ -27,11 +27,15 @@ namespace NodeCollector.WindowsDisks
         private System.Threading.Timer MetricUpdateTimer;
         private Prometheus.Gauge NodeFileSystemSize;
         private Prometheus.Gauge NodeFileSystemFree;
+        private Prometheus.Gauge NodeFileSystemAvail;
+        private Prometheus.Gauge NodeFileSystemReadonly;
 
         public WindowsDisks()
         {
             this.NodeFileSystemSize = Metrics.CreateGauge("node_filesystem_size", "Filesystem size in bytes.", labelNames: new[] { "device", "fstype", "mountpoint" });
             this.NodeFileSystemFree = Metrics.CreateGauge("node_filesystem_free", "Filesystem free space in bytes.", labelNames: new[] { "device", "fstype", "mountpoint" });
+            this.NodeFileSystemAvail = Metrics.CreateGauge("node_filesystem_avail", "Filesystem space available to users in bytes.", labelNames: new[] { "device", "fstype", "mountpoint" });
+            this.NodeFileSystemReadonly = Metrics.CreateGauge("node_filesystem_readonly", "Filesystem read-only status.", labelNames: new[] { "device", "fstype", "mountpoint" });
         }
 
         public string GetName()
@@ -74,48 +78,78 @@ namespace NodeCollector.WindowsDisks
             Debug.WriteLine(string.Format("NodeCollector.WindowsDisks::UpdateMetrics(): Reading perfmon counters ({0}).", DateTime.Now.ToString()));
 
             // Collect details about hard disks
-            SelectQuery selectQuery = new SelectQuery(@"SELECT * FROM Win32_Volume WHERE DriveType!='5'");
-            ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher(selectQuery);
-            ManagementObjectCollection results = managementObjectSearcher.Get();
+            ManagementObjectCollection results;
+            try
+            {
+                SelectQuery selectQuery = new SelectQuery(@"SELECT * FROM Win32_Volume WHERE DriveType!='5'");
+                ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher(selectQuery);
+                results = managementObjectSearcher.Get();
+            }
+            catch(Exception ex)
+            {
+                GVars.MyLog.WriteEntry(string.Format("WindowsDisks: Failed to query WMI for device: {0}.", ex.Message.ToString(), EventLogEntryType.Error, 1000));
+                return;
+            }
+            
             foreach (ManagementObject managementObject in results)
             {
-                string device = "n/a";
+                string device = string.Empty;
                 try
                 {
                     device = managementObject["DeviceID"].ToString().Replace(@"\", "/");
-
-                    string fstype;
-                    try
+                    if(device.Length < 1)
                     {
-                        fstype = managementObject["FileSystem"].ToString().Replace(@"\", "/");
-                    }
-                    catch
-                    {
-                        fstype = "";
+                        device = "n/a";
                     }
 
-                    string mountpoint;
-                    try
-                    {
-                        mountpoint = managementObject["DriveLetter"].ToString().Replace(@"\", "/");
-                    }
-                    catch
-                    {
-                        mountpoint = "";
-                    }
+                    string fstype = this.GetMOBValueString(managementObject, "FileSystem").Replace(@"\", "/");
+                    string mountpoint = this.GetMOBValueString(managementObject, "DriveLetter").Replace(@"\", "/");
 
-                    double capacityBytes = Convert.ToDouble(managementObject["Capacity"]);
-                    double freeBytes = Convert.ToDouble(managementObject["FreeSpace"]);
+                    double capacityBytes = this.GetMOBValueDouble(managementObject, "Capacity");
+                    double freeBytes = this.GetMOBValueDouble(managementObject, "FreeSpace");
+                    double readOnlyState = this.GetMOBValueDouble(managementObject, "Access");
+
                     this.NodeFileSystemSize.Labels(device, fstype, mountpoint).Set(capacityBytes);
                     this.NodeFileSystemFree.Labels(device, fstype, mountpoint).Set(freeBytes);
+                    this.NodeFileSystemAvail.Labels(device, fstype, mountpoint).Set(freeBytes); // on Windows OS the same as NodeFileSystemFree
+                    this.NodeFileSystemReadonly.Labels(device, fstype, mountpoint).Set( ((readOnlyState == 1) ? 1 : 0) );
                 }
                 catch(Exception ex)
                 {
-                    GVars.MyLog.WriteEntry(string.Format("Unable to add volume to metrics: {0}: {1}", device, ex.Message.ToString()), EventLogEntryType.Error, 0);
+                    GVars.MyLog.WriteEntry(string.Format("WindowsDisks: Unable to add volume to metrics: {0}: {1}", device, ex.Message.ToString()), EventLogEntryType.Error, 1000);
                 }
             }
 
         }
+
+        private string GetMOBValueString(ManagementObject obj, string name, string default_value="")
+        {
+            string tmp;
+            try
+            {
+                tmp = obj[name].ToString();
+            }
+            catch
+            {
+                tmp = default_value;
+            }
+            return tmp;
+        }
+
+        private double GetMOBValueDouble(ManagementObject obj, string name, double default_value=0)
+        {
+            double tmp;
+            try
+            {
+                tmp = Convert.ToDouble(obj[name]);
+            }
+            catch
+            {
+                tmp = default_value;
+            }
+            return tmp;
+        }
+
 
     }
 }
