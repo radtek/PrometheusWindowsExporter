@@ -68,6 +68,7 @@ namespace NodeCollector.WindowsBasic
             }
 
             this.RegisterPrintSpooler();
+            this.RegisterPrintSpooler();
 
             // Initialize a timer to search all XX minutes for new updates.
             // The process is very time intersive, so please do not lower this value below one hour.

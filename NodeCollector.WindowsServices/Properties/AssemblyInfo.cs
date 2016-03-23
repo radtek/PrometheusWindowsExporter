@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NodeCollector.WindowsUpdates")]
+[assembly: AssemblyTitle("NodeCollector.WindowsServices")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("NodeCollector.WindowsUpdates")]
+[assembly: AssemblyProduct("NodeCollector.WindowsServices")]
 [assembly: AssemblyCopyright("Copyright © 2016 Thorsten Sauter")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("e168c78c-5d78-4644-abcd-4eb14a8a5506")]
+[assembly: Guid("7C2C6477-AFD7-4CF7-9C0D-70ED9FFDAFB4")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2016.3.23.1227")]
-[assembly: AssemblyFileVersion("2016.3.23.1227")]
+[assembly: AssemblyVersion("2016.3.23.1238")]
+[assembly: AssemblyFileVersion("2016.3.23.1238")]

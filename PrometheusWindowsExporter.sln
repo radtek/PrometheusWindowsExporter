@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeCollector.TaskScheduler
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeCollector.WindowsDisks", "NodeCollector.WindowsDisks\NodeCollector.WindowsDisks.csproj", "{47836FC3-A3D3-49B0-9CB6-F25FB269BE93}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeCollector.WindowsServices", "NodeCollector.WindowsServices\NodeCollector.WindowsServices.csproj", "{5983461C-2631-4330-BB43-4BA7E3A351B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{47836FC3-A3D3-49B0-9CB6-F25FB269BE93}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47836FC3-A3D3-49B0-9CB6-F25FB269BE93}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47836FC3-A3D3-49B0-9CB6-F25FB269BE93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5983461C-2631-4330-BB43-4BA7E3A351B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5983461C-2631-4330-BB43-4BA7E3A351B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5983461C-2631-4330-BB43-4BA7E3A351B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5983461C-2631-4330-BB43-4BA7E3A351B1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
